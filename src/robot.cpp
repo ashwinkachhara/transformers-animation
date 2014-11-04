@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 class vector{
 	public:
@@ -43,6 +44,7 @@ float yaw = 0, pitch = 0, roll = 0;
 int motion_time = 0, thrust=10;
 
 int state = sHUMANOID, prevState = sHUMANOID;
+int mode = MODE_FREE;
 
 float torso_width, torso_length;
 
@@ -1333,7 +1335,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		roll-=5;
 	}
 	
-	//~ camera modes
+	//~ Camera view selection
 	else if (key == GLFW_KEY_1 && action == GLFW_PRESS){
 		camera_state = CAMERA_GLOBAL;
 	}
@@ -1343,22 +1345,37 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	else if (key == GLFW_KEY_3 && action == GLFW_PRESS){
 		camera_state = CAMERA_FOLLOW;
 	}
+	//~ Toggle Mode
+	else if (key == GLFW_KEY_4 && action == GLFW_PRESS){
+		if (mode == MODE_FREE){
+			mode = MODE_RECORD;
+			std::cout << "Mode Record" << std::endl;
+		} else if (mode == MODE_RECORD){
+			mode = MODE_PLAYBACK;
+			std::cout << "Mode Playback" << std::endl;
+		} else if (mode == MODE_PLAYBACK){
+			mode = MODE_FREE;
+			std::cout << "Mode Free" << std::endl;
+		}
+	}
 	
 	//~ save keyframe
 	else if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
-		save_keyframe();
+		if (mode == MODE_RECORD)
+			save_keyframe();
+		else if (mode == MODE_PLAYBACK); //~ Toggle Play/Pause 
 	}
 	
 	//~ Transform	
-	//~ else if (key == GLFW_KEY_TAB && action == GLFW_PRESS){
-		//~ if (state == sHUMANOID){
-			//~ reset_angles_H();
-			//~ transform();
-		//~ }
-		//~ else if (state == sVEHICLE){
-			//~ reset_angles_V();
-			//~ untransform();
-		//~ }
-	//~ }
+	else if (key == GLFW_KEY_TAB && action == GLFW_PRESS){
+		if (state == sHUMANOID){
+			reset_angles_H();
+			transform();
+		}
+		else if (state == sVEHICLE){
+			reset_angles_V();
+			untransform();
+		}
+	}
 	
 }

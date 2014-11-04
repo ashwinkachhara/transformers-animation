@@ -89,6 +89,10 @@
 #define CAMERA_POV 2
 #define CAMERA_FOLLOW 3
 
+#define MODE_FREE 0
+#define MODE_RECORD 1
+#define MODE_PLAYBACK 2
+
 #define KF_FILE "keyframes.txt"
 
 

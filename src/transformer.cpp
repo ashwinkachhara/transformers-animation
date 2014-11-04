@@ -46,7 +46,7 @@ int main(int argc, char** argv){
 	return -1;
 
 	//! Create a windowed mode window and its OpenGL context
-	window = glfwCreateWindow(800, 800, "CS475 Assignment 2.2 | 10D070048 | 10D070001", NULL, NULL);
+	window = glfwCreateWindow(800, 800, "CS475 Assignment 2.3 | 10D070048 | 10D070001", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
