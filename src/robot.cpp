@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <cstdlib>
 
 class vector{
 	public:
@@ -43,8 +44,8 @@ float new_fwdpos, new_sidepos, new_elevpos;
 float yaw = 0, pitch = 0, roll = 0;
 int motion_time = 0, thrust=10;
 
-int state = sHUMANOID, prevState = sHUMANOID;
-int mode = MODE_FREE;
+float state = sHUMANOID, prevState = sHUMANOID;
+int mode = MODE_PLAYBACK;
 
 float torso_width, torso_length;
 
@@ -82,13 +83,13 @@ vector effective_env_size((ENV_SIZE/2)-5, (ENV_SIZE/2)-5, (ENV_SIZE/2)-5);
 
 int camera_state = 2;
 
+//~ float, int to string conversion
 std::string to_string(float val){
 	std::ostringstream o;
 	if (!(o << val))
 		return "";
 	return o.str();
 }
-
 std::string to_string(int val){
 	std::ostringstream o;
 	if (!(o << val))
@@ -96,6 +97,7 @@ std::string to_string(int val){
 	return o.str();
 }
 
+//~ Generate keyframe string
 std::string gen_keyframe(){
 	std::string kf ("");
 	kf = kf + to_string(state) + "\t" + to_string(sidepos) + "\t" + to_string(elevpos) + "\t" + to_string(fwdpos)
@@ -105,12 +107,79 @@ std::string gen_keyframe(){
 	return kf;
 }
 
+//~ Invokes above function and file handling to save the string
 void save_keyframe(){
 	std::string kf = gen_keyframe();
 	std::ofstream kf_file;
 	kf_file.open(KF_FILE, std::ios::out | std::ios::app);
 	kf_file << kf;
 	kf_file.close();
+}
+
+//~ Assigns read keyframe to robot
+void assign_kf(std::string line){
+	std::string delimiter = "\t";
+	
+	size_t pos = 0;
+	std::string part;
+	
+	//~ State
+	pos = line.find(delimiter);
+	part = line.substr(0, pos);
+	state = atof(part.c_str());
+	//~ std::cout << state << std::endl;
+	line.erase(0, pos + delimiter.length());
+	
+	//~ Position in 3d, x,y,z
+	pos = line.find(delimiter);
+	part = line.substr(0, pos);
+	sidepos = atof(part.c_str());
+	//~ std::cout << sidepos << std::endl;
+	line.erase(0, pos + delimiter.length());
+	
+	pos = line.find(delimiter);
+	part = line.substr(0, pos);
+	elevpos = atof(part.c_str());
+	//~ std::cout << elevpos << std::endl;
+	line.erase(0, pos + delimiter.length());
+	
+	pos = line.find(delimiter);
+	part = line.substr(0, pos);
+	fwdpos = atof(part.c_str());
+	//~ std::cout << fwdpos << std::endl;
+	line.erase(0, pos + delimiter.length());
+	
+	//~ Rotation in 3D, yaw , pitch, roll
+	pos = line.find(delimiter);
+	part = line.substr(0, pos);
+	yaw = atof(part.c_str());
+	//~ std::cout << yaw << std::endl;
+	line.erase(0, pos + delimiter.length());
+	
+	pos = line.find(delimiter);
+	part = line.substr(0, pos);
+	pitch = atof(part.c_str());
+	//~ std::cout << pitch << std::endl;
+	line.erase(0, pos + delimiter.length());
+	
+	roll = atof(line.c_str());
+	//~ std::cout << roll << std::endl;
+	
+}
+
+void kf_playback(){
+	std::string line;
+	std::ifstream play_file ("keyframes-play.txt");
+	if (play_file.is_open()){
+		getline(play_file, line);
+		std::string first;
+		if (getline(play_file, first)){
+			assign_kf(first);
+		}
+		while (getline(play_file, line))
+			std::cout << line << std::endl;
+		play_file.close();
+	}
 }
 
 //~ Go back to base position in sHUMANOID
@@ -1361,9 +1430,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	
 	//~ save keyframe
 	else if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
-		if (mode == MODE_RECORD)
+		if (mode == MODE_RECORD){
+			std::cout << "Saving Keyframe" << std::endl;
 			save_keyframe();
-		else if (mode == MODE_PLAYBACK); //~ Toggle Play/Pause 
+		} else if (mode == MODE_PLAYBACK){
+			std::cout << "Starting Playback" << std::endl;
+			kf_playback();
+		}
 	}
 	
 	//~ Transform	

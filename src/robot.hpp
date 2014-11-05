@@ -96,7 +96,7 @@
 #define KF_FILE "keyframes.txt"
 
 
-extern int state, prevState;
+extern float state, prevState;
 
 extern GLuint torso_tex;
 extern GLuint skybox_dn, skybox_up, skybox_rt, skybox_lf, skybox_ft, skybox_bk;
