@@ -46,6 +46,9 @@ int motion_time = 0, thrust=10;
 
 float state = sHUMANOID, prevState = sHUMANOID;
 int mode = MODE_PLAYBACK;
+std::ifstream play_file;
+float play_speeds[6], play_targets[6]; // 6 because we are not interpolating state. That is binary.
+bool doInterpolate = false;
 
 float torso_width, torso_length;
 
@@ -82,6 +85,10 @@ vector color_dark(0.3,0.3,0.3), color_grey(0.7,0.7,0.7), color_light(1,1,0.9), c
 vector effective_env_size((ENV_SIZE/2)-5, (ENV_SIZE/2)-5, (ENV_SIZE/2)-5);		
 
 int camera_state = 2;
+
+void transform();
+void untransform();
+int kf_playback_nextframe();
 
 //~ float, int to string conversion
 std::string to_string(float val){
@@ -167,18 +174,125 @@ void assign_kf(std::string line){
 	
 }
 
-void kf_playback(){
+//~ Set value increment speeds for keyframe playback
+void set_speeds_targets(std::string line){
+	std::string delimiter = "\t";
+	
+	size_t pos = 0;
+	std::string part;
+	//~ std::cout << line << std::endl;
+	//~ State
+	pos = line.find(delimiter);
+	part = line.substr(0, pos);
+	if (atof(part.c_str()) == sHUMANOID && state == sVEHICLE)
+		untransform();
+	else if (atof(part.c_str()) == sVEHICLE && state == sHUMANOID)
+		transform();
+	//~ std::cout << state << std::endl;
+	line.erase(0, pos + delimiter.length());
+	
+	//~ Position in 3d, x,y,z
+	pos = line.find(delimiter);
+	part = line.substr(0, pos);
+	//~ sidepos = atof(part.c_str());
+	play_targets[0] = atof(part.c_str());
+	play_speeds[0] = (play_targets[0] - sidepos)/DELTA_T;
+	//~ std::cout << sidepos << std::endl;
+	line.erase(0, pos + delimiter.length());
+	
+	pos = line.find(delimiter);
+	part = line.substr(0, pos);
+	//~ elevpos = atof(part.c_str());
+	play_targets[1] = atof(part.c_str());
+	play_speeds[1] = (play_targets[1] - elevpos)/DELTA_T;
+	//~ std::cout << elevpos << std::endl;
+	line.erase(0, pos + delimiter.length());
+	
+	pos = line.find(delimiter);
+	part = line.substr(0, pos);
+	//~ fwdpos = atof(part.c_str());
+	play_targets[2] = atof(part.c_str());
+	play_speeds[2] = (play_targets[2] - fwdpos)/DELTA_T;
+	//~ std::cout << fwdpos << std::endl;
+	line.erase(0, pos + delimiter.length());
+	
+	//~ Rotation in 3D, yaw , pitch, roll
+	pos = line.find(delimiter);
+	part = line.substr(0, pos);
+	//~ yaw = atof(part.c_str());
+	play_targets[3] = atof(part.c_str());
+	play_speeds[3] = (play_targets[3] - yaw)/DELTA_T;
+	//~ std::cout << yaw << std::endl;
+	line.erase(0, pos + delimiter.length());
+	
+	pos = line.find(delimiter);
+	part = line.substr(0, pos);
+	//~ pitch = atof(part.c_str());
+	play_targets[4] = atof(part.c_str());
+	play_speeds[4] = (play_targets[4] - pitch)/DELTA_T;
+	//~ std::cout << pitch << std::endl;
+	line.erase(0, pos + delimiter.length());
+	
+	//~ roll = atof(line.c_str());
+	play_targets[5] = atof(line.c_str());
+	play_speeds[5] = (play_targets[5] - roll)/DELTA_T;
+	//~ std::cout << roll << std::endl;
+	for (int i=0; i<6; i++){
+		std::cout << play_targets[i] << ", " << play_speeds[i] << "; ";
+	}
+	std::cout << std::endl;
+}
+
+void kf_interpolate(){
+	if (	((play_targets[0] - sidepos)*play_speeds[0] >= 0) &&
+			((play_targets[1] - elevpos)*play_speeds[1] >= 0) &&
+			((play_targets[2] - fwdpos)*play_speeds[2] >= 0) &&
+			((play_targets[3] - yaw)*play_speeds[3] >= 0) &&
+			((play_targets[4] - pitch)*play_speeds[4] >= 0) &&
+			((play_targets[5] - roll)*play_speeds[5] >= 0)	){
+		sidepos += play_speeds[0];
+		elevpos += play_speeds[1];
+		fwdpos += play_speeds[2];
+		yaw += play_speeds[3];
+		pitch += play_speeds[4];
+		roll += play_speeds[5];		
+	} else {
+		doInterpolate = false;
+		if (kf_playback_nextframe())
+			doInterpolate = true;
+	}
+}
+
+int kf_playback_nextframe(){
 	std::string line;
-	std::ifstream play_file ("keyframes-play.txt");
+	if (play_file.is_open()){
+		if (getline(play_file, line)){
+			std::cout <<line << std::endl;
+			set_speeds_targets(line);
+			return 1;
+		}
+		else if (play_file.eof()){
+			play_file.close();
+			std::cout << "Playback complete." << std::endl;
+			return 0;
+		}
+	}
+	return -1;
+}
+
+void kf_playback_start(){
+	std::string line;
 	if (play_file.is_open()){
 		getline(play_file, line);
 		std::string first;
 		if (getline(play_file, first)){
+			std::cout << first << std::endl;
 			assign_kf(first);
 		}
-		while (getline(play_file, line))
-			std::cout << line << std::endl;
-		play_file.close();
+		if (kf_playback_nextframe())
+			doInterpolate =  true;
+		//~ std::cout << doInterpolate << std::endl;
+		//~ play_file.close();
 	}
 }
 
@@ -1435,7 +1549,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			save_keyframe();
 		} else if (mode == MODE_PLAYBACK){
 			std::cout << "Starting Playback" << std::endl;
-			kf_playback();
+			play_file.open("keyframes-play.txt");
+			kf_playback_start();
 		}
 	}
 	

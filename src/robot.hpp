@@ -94,6 +94,7 @@
 #define MODE_PLAYBACK 2
 
 #define KF_FILE "keyframes.txt"
+#define DELTA_T 50
 
 
 extern float state, prevState;
@@ -102,6 +103,9 @@ extern GLuint torso_tex;
 extern GLuint skybox_dn, skybox_up, skybox_rt, skybox_lf, skybox_ft, skybox_bk;
 extern GLuint cloud;
 
+extern bool doInterpolate;
+
+void kf_interpolate();
 void renderGL(void);
 void movement(void);
 void init_structures(void);

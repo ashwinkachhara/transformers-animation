@@ -95,8 +95,12 @@ int main(int argc, char** argv){
 	{
 
 		// Render here
+		if (doInterpolate)
+			kf_interpolate();
+		
 		renderGL();
 		movement();
+		//~ std::cout << glfwGetTime() << std::endl;
 		// Swap front and back buffers
 		glfwSwapBuffers(window);
 		
