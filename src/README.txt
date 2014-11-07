@@ -43,7 +43,9 @@ Link to YouTube Video: https://www.youtube.com/watch?v=wW7zNaYeoLY
 	'4'						=> Toggles between  
 							MODE_FREE - Free roam mode 
 							MODE_RECORD - Record keyframes in this mode 
-											by pressing SPACE
+											by pressing SPACE. Saved in 
+											keyframes.txt file
 							MODE_PLAYBACK - Play saved keyframes in this
-											mode by pressing SPACE
+											mode by pressing SPACE. Read
+											from keyframes-play.txt
 
