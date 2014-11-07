@@ -5,7 +5,7 @@ CS475 Computer Graphics | Assignment 2.3
 Ashwin Kachhara, 10D070048
 Sumeet Fefar, 10D070001
 
-Link to Report Webpage: http://ashwinkachhara.github.io/transformers-rendering/
+Link to YouTube Video: https://www.youtube.com/watch?v=wW7zNaYeoLY
 
 1. Compile & Run:
 	in Linux Terminal,
@@ -41,7 +41,9 @@ Link to Report Webpage: http://ashwinkachhara.github.io/transformers-rendering/
 	
 	MODES
 	'4'						=> Toggles between  
-								MODE_FREE - Free roam mode 
-								MODE_RECORD - Record keyframes in this mode by pressing SPACE
-								MODE_PLAYBACK - Play saved keyframes in this mode by pressing SPACE
+							MODE_FREE - Free roam mode 
+							MODE_RECORD - Record keyframes in this mode 
+											by pressing SPACE
+							MODE_PLAYBACK - Play saved keyframes in this
+											mode by pressing SPACE
 
