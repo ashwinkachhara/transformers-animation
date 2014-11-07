@@ -11,10 +11,15 @@
 #include <fstream>
 //R/V	RootTransX	RootTransY	RootTransZ	RootRotX	RootRotY	RootRotZ\n
 #define KF_FORMAT "R/V\tRootTransX\tRootTransY\tRootTransZ\tRootRotX\tRootRotY\tRootRotZ\n"
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 800
 
 GLuint torso_tex;
 GLuint skybox_dn, skybox_up, skybox_lf, skybox_rt, skybox_ft, skybox_bk;
 GLuint cloud;
+
+unsigned char *pRGB;
+unsigned int framenum = 0;
 
 void init_textures(void){
 	torso_tex = loadTexture("texture/paris.bmp");
@@ -34,6 +39,32 @@ void init_kf_file(void){
 	kf_file.close();
 }
 
+void capture_frame(unsigned int framenum)
+{
+	//global pointer float *pRGB
+	pRGB = new unsigned char [3 * (SCREEN_WIDTH+1) * (SCREEN_HEIGHT + 1) ];
+
+
+	// set the framebuffer to read
+	//default for double buffered
+	glReadBuffer(GL_BACK);
+
+	glPixelStoref(GL_PACK_ALIGNMENT,1);//for word allignment
+  
+	glReadPixels(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, pRGB);
+	char filename[200];
+	sprintf(filename,"frame_%04d.ppm",framenum);
+	std::ofstream out(filename, std::ios::out);
+	out<<"P6"<<std::endl;
+	out<<SCREEN_WIDTH<<" "<<SCREEN_HEIGHT<<" 255"<<std::endl;
+	out.write(reinterpret_cast<char const *>(pRGB), (3 * (SCREEN_WIDTH+1) * (SCREEN_HEIGHT + 1)) * sizeof(int));
+	out.close();
+
+	//function to store pRGB in a file named count
+	delete pRGB;
+}
+
+
 int main(int argc, char** argv){
 	//! The pointer to the GLFW window
 	GLFWwindow* window;
@@ -46,7 +77,7 @@ int main(int argc, char** argv){
 	return -1;
 
 	//! Create a windowed mode window and its OpenGL context
-	window = glfwCreateWindow(800, 800, "CS475 Assignment 2.3 | 10D070048 | 10D070001", NULL, NULL);
+	window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "CS475 Assignment 2.3 | 10D070048 | 10D070001", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -95,9 +126,10 @@ int main(int argc, char** argv){
 	{
 
 		// Render here
-		if (doInterpolate)
+		if (doInterpolate){
 			kf_interpolate();
-		
+			capture_frame (framenum++);
+		}
 		renderGL();
 		movement();
 		//~ std::cout << glfwGetTime() << std::endl;

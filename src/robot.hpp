@@ -94,7 +94,7 @@
 #define MODE_PLAYBACK 2
 
 #define KF_FILE "keyframes.txt"
-#define DELTA_T 50
+#define DELTA_T 150
 
 
 extern float state, prevState;
