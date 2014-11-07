@@ -16,36 +16,36 @@ Link to YouTube Video: https://www.youtube.com/watch?v=wW7zNaYeoLY
 2. Keyboard Mappings
 	
 	WINDOW
-	'Esc' 					=> Close Window
+	'Esc' 				=> Close Window
 	
 	MOVEMENT
-	'<-'					=> Move Left
-	'->'					=> Move Right
-	'Up Arrow'				=> Move Fwd
+	'<-'				=> Move Left
+	'->'				=> Move Right
+	'Up Arrow'			=> Move Fwd
 	'Down Arrow'			=> Move Back
-	'E'						=> Move Up
-	'C'						=> Move Down
-	'R' & 'T'				=> Change Yaw
-	'F' & 'G'				=> Change Pitch
-	'V' & 'B' 				=> Change Roll
-	'Tab"					=> Transform/Untransform
+	'E'				=> Move Up
+	'C'				=> Move Down
+	'R' & 'T'			=> Change Yaw
+	'F' & 'G'			=> Change Pitch
+	'V' & 'B' 			=> Change Roll
+	'Tab"				=> Transform/Untransform
 	
 	CAMERA
-	'1'						=> Global Camera
-	'2'						=> Point-of-View Camera
-	'3'						=> Vehicle-Following Camera
+	'1'				=> Global Camera
+	'2'				=> Point-of-View Camera
+	'3'				=> Vehicle-Following Camera
 	
 	In CAMERA mode 1
 	Change Viewpoint by
 	'W', 'A', 'S', 'D'
 	
 	MODES
-	'4'						=> Toggles between  
-							MODE_FREE - Free roam mode 
-							MODE_RECORD - Record keyframes in this mode 
-											by pressing SPACE. Saved in 
-											keyframes.txt file
-							MODE_PLAYBACK - Play saved keyframes in this
-											mode by pressing SPACE. Read
-											from keyframes-play.txt
+	'4'				=> Toggles between  
+					MODE_FREE - Free roam mode 
+					MODE_RECORD - Record keyframes in this mode 
+							by pressing SPACE. Saved in 
+							keyframes.txt file
+					MODE_PLAYBACK - Play saved keyframes in this
+							mode by pressing SPACE. Read
+							from keyframes-play.txt
 
