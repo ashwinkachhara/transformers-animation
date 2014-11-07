@@ -28,6 +28,7 @@ Link to Report Webpage: http://ashwinkachhara.github.io/transformers-rendering/
 	'R' & 'T'				=> Change Yaw
 	'F' & 'G'				=> Change Pitch
 	'V' & 'B' 				=> Change Roll
+	'Tab"					=> Transform/Untransform
 	
 	CAMERA
 	'1'						=> Global Camera
@@ -37,4 +38,10 @@ Link to Report Webpage: http://ashwinkachhara.github.io/transformers-rendering/
 	In CAMERA mode 1
 	Change Viewpoint by
 	'W', 'A', 'S', 'D'
+	
+	MODES
+	'4'						=> Toggles between  
+								MODE_FREE - Free roam mode 
+								MODE_RECORD - Record keyframes in this mode by pressing SPACE
+								MODE_PLAYBACK - Play saved keyframes in this mode by pressing SPACE
 

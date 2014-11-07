@@ -128,7 +128,7 @@ int main(int argc, char** argv){
 		// Render here
 		if (doInterpolate){
 			kf_interpolate();
-			capture_frame (framenum++);
+			//~ capture_frame (framenum++);
 		}
 		renderGL();
 		movement();
